@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>File Upload</title>
+	<style>
+		#fileUpload {
+			display: none;
+		}
+		#uploadIcon {
+			background-color: #000000;
+			border: none;
+			color: #fff;
+			padding: 10px 20px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 16px;
+			margin-top: 10px;
+			cursor: pointer;
+		}
+        #button-upload{
+            background-color: green;
+            border-radius: 20px;
+            width: 100px;
+            height: 30px;
+            margin-left: 40px;
+            cursor: pointer;
+        }
+        img{
+            width: 54px; 
+            height: 54px; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            margin-left: 55px;
+        }
+        .container{
+            width: 1400px;
+            height: 168px;
+            border: 1px dotted black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 60px;
+        }
+        body{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+	</style>
+</head>
+<body>
+    <div>
+        <p>Add Candidates to Database</p>
+<div class="container">
+	
+	<form method="post" action="/upload" enctype="multipart/form-data" class="form">
+		<label for="fileUpload">
+            <img src="https://cdn.icon-icons.com/icons2/1182/PNG/512/1490129350-rounded06_82174.png" alt="">
+			<p id="selectedFileName"></p>
+		</label>
+		<input type="file" name="fileUpload" id="fileUpload" onchange="showUploadButton()">
+		<br>
+		<p id="para">Upload a .xlsx or .xls file here</p>
+		<div id="uploadButtonDiv" style="display:none">
+			<input id="button-upload" type="submit" value="Upload">
+		</div>
+	</form>
+</div>
+</div>
+	
+	<script>
+		function showUploadButton() {
+			// Get the file input element and selected file name
+			var fileInput = document.getElementById("fileUpload");
+			var selectedFile = fileInput.files[0];
+			
+			// Check if a file has been selected
+			if (selectedFile) {
+				// Show the upload button
+				document.getElementById("uploadButtonDiv").style.display = "block";
+				document.getElementById("para").style.display="none"
+				// Display the selected file name
+				document.getElementById("selectedFileName").textContent = "Selected file: " + selectedFile.name;
+			}
+		}
+	</script>
+</body>
+</html>
