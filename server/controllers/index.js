@@ -1,85 +1,93 @@
 const readExcelFile = require("read-excel-file/node");
 const { ExcelData } = require("../model/dataModel");
 const { Emp } = require("../model/empSchema");
+const xlsx = require("xlsx")
+const async = require("async")
 
 // ******************************* Post the excel data to mongoDB ***************************************************************
 exports.ExcelDataPost = async (req, res) => {
-  try {
+  try{
     if (req.file == undefined) {
-      return res.status(400).send("Please upload an excel file!");
-    }
-    readExcelFile(req.file.path)
-      .then(async (rows) => {
-        var data = [];
-        for (let i = 1; i < rows.length; i++) {
-          data = rows[i];
-
-          const userExist = await Emp.findOne({ Email: data[1] });
-          if (!userExist) {
-            try {
-              let empData = new Emp({
-                CandidateName: data[0],
-                Email: data[1],
-                MobileNo: data[2],
-                DateofBirth: data[3],
-                WorkExperience: data[4],
-                ResumeTitle: data[5],
-                CurrentLocation: data[6],
-                PostalAddress: data[7],
-                CurrentEmployer: data[8],
-                CurrentDesignation: data[9],
-              });
-              await empData.save();
-            } catch (ex) {
-              res.status(400).send(ex.message);
-            }
-          }
+          return res.status(400).send("Please upload an excel file!");
         }
-        return res.status(200).redirect("/end");
-      })
-      .catch((error) => {
-        return res.status(400).send({
-          message: "Failed to read the uploaded excel file!",
-          error: error.message,
-        });
+
+    // reading the excel file
+    const workbook = xlsx.readFile(req.file.path);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(worksheet);
+
+    // use of aync.eachSeries
+    async.eachSeries(rows, async function(row, callback) {
+      const document = new Emp({         
+      CandidateName:row['Name of the Candidate'],
+      Email:row['Email'],
+      MobileNo:row['Mobile No.'],
+      DateofBirth:row['Date of Birth'],
+      WorkExperience:row['Work Experience'],
+      ResumeTitle:row['Resume Title'],
+      CurrentLocation:row['Current Location'],
+      PostalAddress:row['Postal Address'],
+      CurrentEmployer:row['Current Employer'],
+      CurrentDesignation:row['Current Designation'],
       });
-  } catch (ex) {
-    res.status(500).send(ex.message);
+
+      // Storing all data to mongoDb
+      try {
+          await document.save();
+          console.log(`Document with id ${document._id} saved successfully`);
+        } catch (err) {
+          console.error(`Error saving document: ${err}`);
+        }
+    }, function(err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('All documents inserted successfully');
+      }
+    });
+      return res.status(200).redirect("/end");
+
+  }catch(error){
+    res.send("error in reading file")
+    console.log(error);
   }
   return;
 };
 
-// ********************* when Unknown file is uploaded this route will be used **********************************************************
+
+
+// ********************* Data will be store in MongoDb array format **********************************************************
 exports.excelDataExtractor = async (req, res) => {
-  try {
+  try{
     if (req.file == undefined) {
-      return res.status(400).send("Please upload an excel file!");
-    }
-    readExcelFile(req.file.path)
-      .then(async (rows) => {
-        var data = [];
-        for (let i = 0; i < rows.length; i++) {
-          data.push(rows[i].Email);
-          console.log(data[i][1]);
+          return res.status(400).send("Please upload an excel file!");
         }
-        for (let i = 0; i < data.length; i++) {
-          try {
-            let excelData = new ExcelData({ data: data[i] });
-            await excelData.save();
-          } catch (ex) {
-            res.status(400).send(ex.message);
-          }
+    // reading the excel file
+    const workbook = xlsx.readFile(req.file.path);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(worksheet);
+
+    // use of aync.eachSeries
+    async.eachSeries(rows, async function(row, callback) {
+      const document = new ExcelData({row});
+      // Storing all data to mongoDb
+      try {
+          await document.save();
+          console.log(`Document with id ${document._id} saved successfully`);
+        } catch (err) {
+          console.error(`Error saving document: ${err}`);
         }
-        return res.status(200).redirect("/end");
-      })
-      .catch((error) => {
-        return res.status(400).send({
-          message: "Failed to read the uploaded excel file!",
-          error: error.message,
-        });
-      });
-  } catch (ex) {
-    res.status(500).send(ex.message);
+    }, function(err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('All documents inserted successfully');
+      }
+    });
+      return res.status(200).redirect("/end");
+  }catch(error){
+    res.send("error in reading file")
+    console.log(error);
   }
   return;
 };
