@@ -1,6 +1,11 @@
 ### Storing ExcelData to MongoDB
 making a simple web application which takes a excel file from user and store that file into MongoDB database.
 
+## Demo
+
+https://github.com/jayrambagal/StoreExcelData-to-Mongo/assets/94613732/db07c557-e515-40f7-8a9c-d40956ac291a
+
+
 ## Technologies used
 
 * Node js -A runtime environment to help build fast server applications using JS
