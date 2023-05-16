@@ -1,6 +1,12 @@
 ### Storing ExcelData to MongoDB
 making a simple web application which takes a excel file from user and store that file into MongoDB database.
 
+#### Now Handling Some conditions
+1. Use of async.eachSeries
+2. Email id should be unique
+3. Duplicate checking using MongoDB query
+4. Skip row if duplicate exists in database
+
 ## Demo
 
 https://github.com/jayrambagal/StoreExcelData-to-Mongo/assets/94613732/db07c557-e515-40f7-8a9c-d40956ac291a
